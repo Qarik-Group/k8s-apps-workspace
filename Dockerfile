@@ -7,7 +7,7 @@ RUN wget https://storage.googleapis.com/kubernetes-release/release/v1.15.0/bin/l
     -O /usr/local/bin/kubectl && chmod +x /usr/local/bin/kubectl
 
 FROM docker:stable-dind
-RUN apk update && apk upgrade && apk add --no-cache bash
+RUN apk update && apk upgrade && apk add --no-cache bash jq
 COPY --from=build /usr/local/bin/ytt /usr/local/bin/ytt
 COPY --from=build /usr/local/bin/kbld /usr/local/bin/kbld
 COPY --from=build /usr/local/bin/kapp /usr/local/bin/kapp

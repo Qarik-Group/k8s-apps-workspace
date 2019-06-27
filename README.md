@@ -10,13 +10,27 @@ Set your default namespace:
 kubectl config set-context --current --namespace {namespace_name}
 ```
 
+Give your workspace a name
+```
+export WORKSPACE=w-$(echo "$(whoami)$(pwd)" | shasum | cut -c1-5)
+```
+
+Create a service account for your workspace
+```
+kubectl create serviceaccount ${WORKSPACE}-sa
+NS=$(kubectl config view --minify --output 'jsonpath={..namespace}')
+kubectl create clusterrolebinding ${WORKSPACE}-crb \
+    --clusterrole=cluster-admin --serviceaccount=${NS}:${WORKSPACE}-sa
+```
+
 Create your workspace:
 ```
 kwt workspace create \
-    --workspace w-$(echo "$(whoami)$(pwd)" | shasum | cut -c1-5) \
+    --workspace ${WORKSPACE} \
     --image starkandwayne/k8s-apps-workspace:latest \
     --image-command-arg --mtu=1400 \
     --input workspace=.:/root/workspace \
+    --service-account ${WORKSPACE}-sa \
     --privileged \
     --watch \
     --enter \
